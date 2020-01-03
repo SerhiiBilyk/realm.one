@@ -1,12 +1,12 @@
 use amethyst::core::{Transform, SystemDesc};
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Join, Read, Entities, System, SystemData, World, WriteStorage};
+use amethyst::ecs::{Join, Read, Entities, System, SystemData, World, WriteStorage, ReadStorage};
 use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
 
 use std::time::Instant;
 
-use crate::components::PlayerComponent;
+use crate::components::{PlayerComponent, TileComponent};
 use crate::character_sprites::{Orientation, get_oriented_sprite};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 
@@ -20,12 +20,13 @@ impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
+        ReadStorage<'s, TileComponent>,
         WriteStorage<'s, SpriteRender>,
         Entities<'s>,
         Read<'s, InputHandler<MovementBindingTypes>>,
     );
 
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, entities, input): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut players, tiles, mut sprite_renders, entities, input): Self::SystemData) {
         for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
             let now = Instant::now();
 
@@ -50,6 +51,11 @@ impl<'s> System<'s> for PlayerSystem{
                     orientation = player.orientation.clone()
                 }
                 player.orientation = orientation.clone();
+
+                let mut next_cell_transform = transform.clone();
+                next_cell_transform.move_up(vertical * TILE_SIZE);
+                next_cell_transform.move_right(horizontal * TILE_SIZE);
+                // Now get the corresponding tile?
 
                 player.last_movement_instant = now.clone();
                 

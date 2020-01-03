@@ -6,6 +6,8 @@ use amethyst::{
 };
 
 extern crate tiled;
+use crate::components::TileComponent;
+
 use std::{
     fs::File,
     io::BufReader,
@@ -110,6 +112,7 @@ impl Room {
                 if col.gid != 0 {
                     world
                         .create_entity()
+                        .with(TileComponent::new(false))
                         .with(self.sprites[col.gid as usize - 1].clone())
                         .with(transform)
                         .build();

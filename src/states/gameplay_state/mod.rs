@@ -7,7 +7,7 @@ use amethyst::{
 };
 
 use crate::map;
-use crate::components::PlayerComponent;
+use crate::components::{PlayerComponent, TileComponent};
 use crate::character_sprites::{get_oriented_sprite, load_sprites};
 
 pub struct GamePlayState {
@@ -18,6 +18,7 @@ impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         world.register::<PlayerComponent>();
+        world.register::<TileComponent>();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
