@@ -57,12 +57,26 @@ impl<'s> System<'s> for PlayerSystem{
                 next_cell_transform.move_right(horizontal * TILE_SIZE);
                 // Now get the corresponding tile?
 
-                player.last_movement_instant = now.clone();
-                
-                sprite_renders.insert(entity, get_oriented_sprite(player.spritesheet_handle.clone(), orientation));
-                transform.move_up(vertical * TILE_SIZE);
-                transform.move_right(horizontal * TILE_SIZE);
+                for (tile, tile_transform) in (&tiles, &transforms).join() {
+                    let tile_x = tile_transform.translation().x;
+                    let tile_y = tile_transform.translation().y;
+
+                    let player_next_x = next_cell_transform.translation().x;
+                    let player_next_y = next_cell_transform.translation().y;
+
+                    // Find the tile in front of the player.
+                    if player_next_x == tile_x && player_next_y == tile_y {
+                        if !tile.collidable {
+                            player.last_movement_instant = now.clone();
+
+                            sprite_renders.insert(entity, get_oriented_sprite(player.spritesheet_handle.clone(), orientation.clone()));
+                            transform.move_up(vertical * TILE_SIZE);
+                            transform.move_right(horizontal * TILE_SIZE);
+                        }
+                    }
+                }
+
             }
-        } 
+        }
     }
 }
